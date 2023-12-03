@@ -13,9 +13,9 @@ type Leak_nodes struct {
 type Leak struct {
 	Ip               string   `json:"Ip"`
 	Resource_id      string   `json:"resource_id"`
-	Leak_count       int      `json:"leak_count`
+	Leak_count       int      `json:"leak_count"`
 	Leak_event_count int      `json:"leak_event_count"`
-	Open_ports       []string `json:"open_ports`
+	Open_ports       []string `json:"open_ports"`
 	Events           []Events `json:"events"`
 }
 
@@ -25,6 +25,12 @@ type Events struct {
 	Host         string `json:"host"`
 	Port         string `json:"port"`
 	Protocol     string `json:"protocol"`
+	HTTP         []HTTP `json:"http"`
+}
+
+type HTTP struct {
+	Root string `json:"root"`
+	URL  string `json:"url"`
 }
 
 func main() {
