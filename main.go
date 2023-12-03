@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 type Leak_nodes struct {
@@ -20,17 +21,26 @@ type Leak struct {
 }
 
 type Events struct {
-	Event_source string `json:"event_source"`
-	Ip           string `json:"ip"`
-	Host         string `json:"host"`
-	Port         string `json:"port"`
-	Protocol     string `json:"protocol"`
-	HTTP         []HTTP `json:"http"`
+	Event_source string    `json:"event_source"`
+	Ip           string    `json:"ip"`
+	Host         string    `json:"host"`
+	Port         string    `json:"port"`
+	Protocol     string    `json:"protocol"`
+	HTTP         HTTP      `json:"http"`
+	Summary      string    `json:"summary"`
+	Time         time.Time `json:"time"`
+	Network      Network   `json:"network"`
 }
 
 type HTTP struct {
 	Root string `json:"root"`
 	URL  string `json:"url"`
+}
+
+type Network struct {
+	Organisation   string `json:"organization_name"`
+	ASN            int    `json:"asn"`
+	Network_subnet string `json:"network"`
 }
 
 func main() {
@@ -50,11 +60,17 @@ func main() {
 		fmt.Println("\nEVENTS:")
 
 		for x := 0; x < len(data.Leak_nodes[i].Events); x++ {
+			fmt.Println("Summary:", data.Leak_nodes[i].Events[x].Summary)
+			fmt.Println("Time:", data.Leak_nodes[i].Events[x].Time)
 			fmt.Println("Event Source:", data.Leak_nodes[i].Events[x].Event_source)
 			fmt.Println("Host IP:", data.Leak_nodes[i].Events[x].Ip)
 			fmt.Println("Host Address:", data.Leak_nodes[i].Events[x].Host)
 			fmt.Println("Host Port:", data.Leak_nodes[i].Events[x].Port)
 			fmt.Println("Host Protocol in Use:", data.Leak_nodes[i].Events[x].Protocol)
+			fmt.Println("Root:", data.Leak_nodes[i].Events[x].HTTP.Root)
+			fmt.Println("URL:", data.Leak_nodes[i].Events[x].HTTP.URL)
+
+			fmt.Println("Organisation:", data.Leak_nodes[i].Events[x].Network.Organisation)
 
 		}
 	}
