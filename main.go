@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"time"
 )
@@ -12,12 +15,14 @@ type Leak_nodes struct {
 }
 
 type Leak struct {
-	Ip               string   `json:"Ip"`
-	Resource_id      string   `json:"resource_id"`
-	Leak_count       int      `json:"leak_count"`
-	Leak_event_count int      `json:"leak_event_count"`
-	Open_ports       []string `json:"open_ports"`
-	Events           []Events `json:"events"`
+	Ip               string    `json:"Ip"`
+	Resource_id      string    `json:"resource_id"`
+	Leak_count       int       `json:"leak_count"`
+	Leak_event_count int       `json:"leak_event_count"`
+	Open_ports       []string  `json:"open_ports"`
+	Events           []Events  `json:"events"`
+	Creation_date    time.Time `json:"creation_date"`
+	Update_date      time.Time `json:"update_date"`
 }
 
 type Events struct {
@@ -69,10 +74,41 @@ func main() {
 			fmt.Println("Host Protocol in Use:", data.Leak_nodes[i].Events[x].Protocol)
 			fmt.Println("Root:", data.Leak_nodes[i].Events[x].HTTP.Root)
 			fmt.Println("URL:", data.Leak_nodes[i].Events[x].HTTP.URL)
-
 			fmt.Println("Organisation:", data.Leak_nodes[i].Events[x].Network.Organisation)
 
 		}
+
+		fmt.Println("First Seen:", data.Leak_nodes[i].Creation_date)
+		fmt.Println("Last Updated:", data.Leak_nodes[i].Update_date)
+
+		httpposturl := os.Getenv("webhook_key")
+
+		fmt.Println("HTTP JSON POST URL:", httpposturl)
+
+		var jsonData = []byte(`{
+			"username": "webhooktest",
+			"content": "123"
+		}`)
+		request, error := http.NewRequest("POST", httpposturl, bytes.NewBuffer(jsonData))
+		if error != nil {
+			fmt.Println("request error")
+		}
+		request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+		fmt.Println(request)
+
+		client := &http.Client{}
+		response, error := client.Do(request)
+		if error != nil {
+			panic(error)
+		}
+		defer response.Body.Close()
+
+		fmt.Println("response Status:", response.Status)
+		//fmt.Println("response Headers:", response.Header)
+		body, _ := io.ReadAll(response.Body)
+		fmt.Println("response Body:", string(body))
+
 	}
 
 }
