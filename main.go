@@ -56,46 +56,50 @@ func main() {
 	_ = json.Unmarshal([]byte(file), &data)
 
 	for i := 0; i < len(data.Leak_nodes); i++ {
-		fmt.Println("IP: ", data.Leak_nodes[i].Ip)
-		fmt.Println("Resource ID: ", data.Leak_nodes[i].Resource_id)
-		fmt.Println("Leaks Found: ", data.Leak_nodes[i].Leak_count)
-		fmt.Println("Total Leaks: ", data.Leak_nodes[i].Leak_event_count)
-		fmt.Println("Open Ports: ", data.Leak_nodes[i].Open_ports)
-
-		fmt.Println("\nEVENTS:")
+		ip := data.Leak_nodes[i].Ip
+		resource_id := data.Leak_nodes[i].Resource_id
+		leaks_found := data.Leak_nodes[i].Leak_count
+		total_leaks := data.Leak_nodes[i].Leak_event_count
+		open_ports := data.Leak_nodes[i].Open_ports
 
 		for x := 0; x < len(data.Leak_nodes[i].Events); x++ {
-			fmt.Println("Summary:", data.Leak_nodes[i].Events[x].Summary)
-			fmt.Println("Time:", data.Leak_nodes[i].Events[x].Time)
-			fmt.Println("Event Source:", data.Leak_nodes[i].Events[x].Event_source)
-			fmt.Println("Host IP:", data.Leak_nodes[i].Events[x].Ip)
-			fmt.Println("Host Address:", data.Leak_nodes[i].Events[x].Host)
-			fmt.Println("Host Port:", data.Leak_nodes[i].Events[x].Port)
-			fmt.Println("Host Protocol in Use:", data.Leak_nodes[i].Events[x].Protocol)
-			fmt.Println("Root:", data.Leak_nodes[i].Events[x].HTTP.Root)
-			fmt.Println("URL:", data.Leak_nodes[i].Events[x].HTTP.URL)
-			fmt.Println("Organisation:", data.Leak_nodes[i].Events[x].Network.Organisation)
+			e_summary := data.Leak_nodes[i].Events[x].Summary
+			e_time := data.Leak_nodes[i].Events[x].Time
+			e_event_source := data.Leak_nodes[i].Events[x].Event_source
+			e_host_ip := data.Leak_nodes[i].Events[x].Ip
+			e_host_address := data.Leak_nodes[i].Events[x].Host
+			e_host_ports := data.Leak_nodes[i].Events[x].Port
+			e_protocol := data.Leak_nodes[i].Events[x].Protocol
+			e_root := data.Leak_nodes[i].Events[x].HTTP.Root
+			e_http_url := data.Leak_nodes[i].Events[x].HTTP.URL
+			e_organisation := data.Leak_nodes[i].Events[x].Network.Organisation
 
 		}
 
-		fmt.Println("First Seen:", data.Leak_nodes[i].Creation_date)
-		fmt.Println("Last Updated:", data.Leak_nodes[i].Update_date)
+		first_seen := data.Leak_nodes[i].Creation_date
+		last_updated := data.Leak_nodes[i].Update_date
 
-		httpposturl := os.Getenv("webhook_key")
+		webhook_url := os.Getenv("webhook_key")
 
-		fmt.Println("HTTP JSON POST URL:", httpposturl)
+		fmt.Println("HTTP JSON POST URL:", webhook_url)
 
-		var jsonData = []byte(`{
-			"username": "webhooktest",
-			"content": "123"
-		}`)
-		request, error := http.NewRequest("POST", httpposturl, bytes.NewBuffer(jsonData))
+		values := map[string]string{
+			"username": "WebHook Test",
+			"content":  ip,
+		}
+
+		jsonData, error := json.Marshal(values)
+		if error != nil {
+			panic(error)
+		}
+
+		fmt.Printf("\nThis is the value: %s \n", ip)
+
+		request, error := http.NewRequest("POST", webhook_url, bytes.NewBuffer(jsonData))
 		if error != nil {
 			fmt.Println("request error")
 		}
 		request.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-		fmt.Println(request)
 
 		client := &http.Client{}
 		response, error := client.Do(request)
@@ -105,7 +109,6 @@ func main() {
 		defer response.Body.Close()
 
 		fmt.Println("response Status:", response.Status)
-		//fmt.Println("response Headers:", response.Header)
 		body, _ := io.ReadAll(response.Body)
 		fmt.Println("response Body:", string(body))
 
