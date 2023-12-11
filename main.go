@@ -57,12 +57,12 @@ func main() {
 
 	for i := 0; i < len(data.Leak_nodes); i++ {
 		ip := data.Leak_nodes[i].Ip
-		//	resource_id := data.Leak_nodes[i].Resource_id
-		//	leaks_found := data.Leak_nodes[i].Leak_count
-		//	total_leaks := data.Leak_nodes[i].Leak_event_count
-		//	open_ports := data.Leak_nodes[i].Open_ports
-		//  first_seen := data.Leak_nodes[i].Creation_date
-		//  last_updated := data.Leak_nodes[i].Update_date
+		resource_id := data.Leak_nodes[i].Resource_id
+		leaks_found := data.Leak_nodes[i].Leak_count
+		total_leaks := data.Leak_nodes[i].Leak_event_count
+		open_ports := data.Leak_nodes[i].Open_ports
+		first_seen := data.Leak_nodes[i].Creation_date
+		last_updated := data.Leak_nodes[i].Update_date
 
 		//	for x := 0; x < len(data.Leak_nodes[i].Events); x++ {
 		//		e_summary := data.Leak_nodes[i].Events[x].Summary
@@ -84,10 +84,10 @@ func main() {
 			"embeds": [
 			  {
 				"title": "Test Title",
-				"description": "This is the IP: %v "
+				"description": "This is the IP: %v \n This is the Resource ID: %v \n Total amount leaks found: %v \n Total leaks found: %v \n list of open ports found: %v \n Leak first seen on: %v \n Last time leask was found: %v"
 			  }
 			]
-		  }`, ip))
+		  }`, ip, resource_id, leaks_found, total_leaks, open_ports, first_seen, last_updated))
 
 		fmt.Printf("\nThis is the value: %s \n", jsonData)
 
