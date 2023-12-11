@@ -78,6 +78,10 @@ func main() {
 		//}
 
 		webhook_url := os.Getenv("webhook_key")
+		if webhook_url == "" {
+			fmt.Println("Discord Webhook not set")
+			return
+		}
 
 		var jsonData = []byte(fmt.Sprintf(`{
 			"username": "Leak Notification",
@@ -104,9 +108,13 @@ func main() {
 		}
 		defer response.Body.Close()
 
-		fmt.Println("response Status:", response.Status)
-		body, _ := io.ReadAll(response.Body)
-		fmt.Println("response Body:", string(body))
+		if response.Status == "204 No Content" {
+			fmt.Println("Post Successful")
+		} else {
+			fmt.Println("response Status:", response.Status)
+			body, _ := io.ReadAll(response.Body)
+			fmt.Println("response Body:", string(body))
+		}
 
 	}
 }
